@@ -4,6 +4,10 @@ public class BugSpawner : MonoBehaviour
 {
     public GameObject bugPlantPrefab;
 
+    public GameObject growPosition;
+
+    public Transform plantHolders;
+
     public int collectedBugs = 0;
 
     public float harvestRadius = 1f;
@@ -19,16 +23,21 @@ public class BugSpawner : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.C))
         {
-            if (Physics.SphereCast(gameObject.transform.position, harvestRadius, Vector3.zero, out RaycastHit hit, 0, plantMask))
+            Collider[] plantsColliders = Physics.OverlapSphere(growPosition.transform.position, harvestRadius, plantMask);
+
+            Debug.Log("Hit colliders are " + plantsColliders);
+
+            foreach (Collider collider in plantsColliders)
             {
-                TryToHarvestPlant(hit.transform.gameObject);
+                Debug.Log("Collider is " + collider);
+                TryToHarvestPlant(collider.transform.gameObject);
             }
         }
     }
 
     public void SpawnPot()
     {
-        Instantiate(bugPlantPrefab, gameObject.transform);
+        Instantiate(bugPlantPrefab, growPosition.transform.position, Quaternion.identity, plantHolders);
     }
 
     public void TryToHarvestPlant(GameObject plantToHarvest)
