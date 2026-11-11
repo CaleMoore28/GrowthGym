@@ -4,8 +4,10 @@ public class BugSpawner : MonoBehaviour
 {
     public GameObject bugPlantPrefab;
 
+    public int collectedBugs = 0;
+
     public float harvestRadius = 1f;
-    public LayerMask layerMask;
+    public LayerMask plantMask;
 
     // Update is called once per frame
     private void Update()
@@ -17,8 +19,10 @@ public class BugSpawner : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.C))
         {
-            if (Physics.SphereCast(gameObject.transform.position, harvestRadius, Vector3.zero, out RaycastHit hit, 0, layerMask))
-            TryToHarvestPlant();
+            if (Physics.SphereCast(gameObject.transform.position, harvestRadius, Vector3.zero, out RaycastHit hit, 0, plantMask))
+            {
+                TryToHarvestPlant(hit.transform.gameObject);
+            }
         }
     }
 
@@ -27,13 +31,18 @@ public class BugSpawner : MonoBehaviour
         Instantiate(bugPlantPrefab, gameObject.transform);
     }
 
-    public void TryToHarvestPlant()
+    public void TryToHarvestPlant(GameObject plantToHarvest)
     {
+        Debug.Log("Tried to harvest plant");
 
-    }
+        BugLogic bugPlantScript = plantToHarvest.GetComponent<BugLogic>();
 
-    void OnCollisionEnter(Collider colldier)
-    {
+        if (bugPlantScript.harvestable == true)
+        {
+            collectedBugs += bugPlantScript.harvestAmount;
+            Destroy(plantToHarvest);
 
+            Debug.Log("Current bug total is " + collectedBugs);
+        }
     }
 }
